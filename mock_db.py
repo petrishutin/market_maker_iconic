@@ -4,6 +4,7 @@ from pprint import pprint
 
 
 def get_data_from_db(account_id, date, number_or_lines=100):
+    """Returns mocked data from DB"""
     mocked_data = []
     date = datetime.strptime(date, '%Y-%m-%d')
     seconds_to_increment = 86400 // number_or_lines
@@ -18,11 +19,10 @@ def get_data_from_db(account_id, date, number_or_lines=100):
 
 
 def random_price(side):
-    price = 10 + randint(0, 9)/ 10
+    price = 10 + randint(0, 9) / 10
     if side == 'SELL':
-        return price + 2
+        return price + 0.5
     return price
-
 
 
 def random_side():

@@ -12,7 +12,7 @@ def main():
     account_id = args.account
     date = args.date
     result = check_market_maker(account_id, date)
-    print(result)
+    print(f'Total time when spread was met at {date} for account_id {account_id} is', result)
 
 
 if __name__ == '__main__':
