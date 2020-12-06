@@ -2,7 +2,7 @@
 
 import argparse
 from check_market_maker import check_market_maker
-
+from time import time
 
 def main():
     parser = argparse.ArgumentParser()
@@ -16,4 +16,6 @@ def main():
 
 
 if __name__ == '__main__':
+    t1 = time()
     main()
+    print(f'calculated in {time()-t1} seconds')

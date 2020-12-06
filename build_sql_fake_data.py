@@ -2,6 +2,7 @@ import sqlite3
 from random import randint
 from mock_db import random_side, random_price
 from datetime import datetime, timedelta
+from time import time
 
 
 def build_sql_fake_data(db_name):
@@ -13,7 +14,7 @@ def build_sql_fake_data(db_name):
                                   account_id INTEGER,
                                   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                   side TEXT,
-                                  price REAL,
+                                  price DECIMAL(3,2),
                                   size INTEGER);"""
     cursor.execute(create_table)
     conn.commit()
@@ -46,5 +47,6 @@ def create_random_data_for_single_day(date: datetime.date, lines = 10000, number
 
 if __name__ == '__main__':
     DB_NAME = 'test.db'
+    t1 = time()
     build_sql_fake_data(DB_NAME)
-    print(f'Mock data inserted to {DB_NAME}')
+    print(f'SQL data build in {time()-t1}\nNumber of rows: 3660000\nDB name: {DB_NAME}')

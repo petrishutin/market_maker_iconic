@@ -1,18 +1,21 @@
+import sqlite3
 from datetime import datetime, timedelta
 
-from mock_db import get_data_from_db
 
-
-def check_market_maker(account_id: int, date: str) -> str:
+def check_market_maker(account_id: int, date: str, db_name: str = 'test.db') -> str:
     """This function calculates how long market maker program terms were being complied for specific date"""
-    data_for_date: list = get_data_from_db(account_id, date)
-    data_for_date.sort(key=lambda x: x[2])
+    next_day = datetime.strptime(date, "%Y-%m-%d") + timedelta(days=1)
+    next_day = str(next_day.date())
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    sql_request = f"""SELECT * FROM orders WHERE timestamp >= date('{date}') and timestamp < date('{next_day}') and account_id = {account_id}"""
+    data = cursor.execute(sql_request)
     actual_buy_orders = {}
     actual_sell_orders = {}
     last_time_spread_met = None
     total_time_spread_met = timedelta()
-    for line in data_for_date:
-        # updating orders books
+    line = data.fetchone()
+    while line:
         if line[3] == 'SELL':
             actual_sell_orders.update({line[4]: line[5]})
         else:
@@ -22,12 +25,15 @@ def check_market_maker(account_id: int, date: str) -> str:
         if 0 < spread < 2000:
             if not last_time_spread_met:
                 last_time_spread_met = datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S')
+                line = cursor.fetchone()
                 continue
             delt = (datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S') - last_time_spread_met)
             total_time_spread_met += delt
             last_time_spread_met = datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S')
+            line = cursor.fetchone()
             continue
         last_time_spread_met = None
+        line = cursor.fetchone()
     return str(total_time_spread_met)
 
 
@@ -68,4 +74,4 @@ def best_price(order_book, is_buy_price=False):
 
 
 if __name__ == '__main__':
-    print(check_market_maker(1, '2020-12-1'))
+    print(check_market_maker(100, '2020-10-03'))
